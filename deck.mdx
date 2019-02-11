@@ -1,0 +1,431 @@
+export theme from "./theme"
+
+# Relax
+
+---
+
+# Forget Best Practices
+
+---
+
+# Come with Me on a Journey
+
+---
+
+# Through Metaprogramming
+
+---
+
+> _Programming_
+
+> "code processes user input"
+
+---
+
+> _Metaprogramming_
+
+> "code processes itself"
+
+---
+
+## Familiar Metaprogramming
+
+```js
+let person = { name: "John" }
+//The code is looking at itself
+Object.keys(person).forEach(key => {
+  console.log(key) //"name"
+})
+```
+
+---
+
+# This Presentation is About Proxies
+
+> My name is John Lindquist
+
+---
+
+# Proxies are Metaprogramming
+
+> Code that processes itself
+
+---
+
+# Why Should You Care?
+
+Because it opens a whole new world of possibilities
+
+---
+
+## Log All Property Changes
+
+```js
+let person = {
+  first: "John"
+}
+
+person = logger(person)
+
+person.first = "Mindy"
+/*
+  console.log shows:
+  first: John -> Mindy
+*/
+```
+
+---
+
+## Trap Properties
+
+```js
+person.first = "Mindy"
+
+//TRAPPED!
+set(target, key, value) {
+  //do whatever you want here!
+  target[key] = value
+}
+```
+
+---
+
+## Proper Trap
+
+```js
+set(target, key, value) {
+  //Reflection knows if assignment succeeded
+  return Reflect.set(target, key, value)
+}
+```
+
+---
+
+## Traps Belong to Handlers
+
+```js
+let handler = {
+  //The "set" trap
+  set(target, key, value) {
+    return Reflect.set(target, key, value)
+  }
+}
+```
+
+## Proxy Receives Target and Handler
+
+```js
+new Proxy(person, handler)
+```
+
+---
+
+## Full "Logger"
+
+```js
+const logger = obj => {
+  let handler = {
+    set(target, key, value) {
+      console.log(`${key}: ${target[key]} -> ${value}`)
+      return Reflect.set(target, key, value)
+    }
+  }
+
+  return new Proxy(obj, handler)
+}
+```
+
+---
+
+## Sure, logging is useful, but what else can I do?
+
+---
+
+## Reactive/Callbacks on Change
+
+```js
+let effect = current => {
+  //render, request, whatever!
+}
+
+let person = {
+  name: "John"
+}
+
+person = observable(person, effect)
+
+person.name = "Mindy"
+```
+
+---
+
+```js
+export const observable = (obj, callback) => {
+  const handler = {
+    set(target, key, value) {
+      const success = Reflect.set(target, key, value)
+      if (success) {
+        callback(target)
+      }
+      return success
+    }
+  }
+
+  return new Proxy(obj, handler)
+}
+```
+
+---
+
+# Bad Ideas
+
+---
+
+## Install My Bad Ideas
+
+```bash
+npm i @johnlindquist/has-bad-ideas
+```
+
+---
+
+# Track
+
+```js
+import { track, review } from "@johnlindquist/has-bad-ideas"
+
+let person = {
+  first: "John",
+  last: "Lindquist",
+  age: 37
+}
+
+person = track(person)
+```
+
+---
+
+```js
+person.first = "Mindy"
+person.last = "Smith"
+person.age = 36
+
+review(person) //[Object, Object, Object, Object]
+review(person, -1) //{first: "Mindy", last: "Smith", age: 37}
+review(person, -2) //{first: "Mindy", last: "Lindquist", age: 37}
+```
+
+---
+
+## Hi
+
+```js
+const proxy = new Proxy({}, {})
+```
+
+---
+
+---
+
+#Box
+
+```js
+let person = {
+  first: "John",
+  last: "Lindquist",
+  age: 37
+}
+```
+
+```js
+person = box(person)
+```
+
+```js
+person.first() //"John"
+person.first("Mindy") //{...person, first: "Mindy"}
+```
+
+```js
+let fn = str => string.toUpperCase()
+person.first(fn) //{...person, name:"JOHN"}
+```
+
+```js
+person
+  .first(fn)
+  .last("Smith")
+  .age(i => i + 1)
+//{first: "JOHN", last: "Smith", age: 38}
+```
+
+---
+
+# Chain
+
+```js
+let person = {
+  first: "John",
+  last: "Lindquist",
+  age: 37
+}
+```
+
+```js
+person = chain(person)
+```
+
+```js
+person.first
+  .replace("oh", "a")
+  .repeat(3)
+  .value()
+
+//"JanJanJan"
+```
+
+---
+
+# Observe
+
+```js
+import { observe } from "@johnlindquist/has-bad-ideas"
+import { switchMap, mapTo } from "rxjs/operators"
+import { interval } from "rxjs"
+
+let person = {
+  name: "John"
+}
+
+person = observe(person)
+```
+
+---
+
+```js
+person
+  .name(
+    switchMap(name => {
+      return interval(1000).pipe(mapTo(name))
+    })
+  )
+  .subscribe(console.log)
+```
+
+https://codesandbox.io/s/7z5j45mwv6
+
+---
+
+## Create API
+
+```js
+import { createApi } from "@johnlindquist/has-bad-ideas"
+
+let api = createApi("https://swapi.co/api")
+```
+
+---
+
+Get `/people` from api:
+
+```js
+async function main() {
+  let people = await api.people() //Response JSON'ed
+}
+
+main()
+```
+
+---
+
+Get `/people/1` from api:
+
+```js
+let person = await api.people(1)
+//
+```
+
+https://codesandbox.io/s/73qv66745j
+
+---
+
+# Good Ideas
+
+---
+
+## Lenses
+
+```js
+```
+
+---
+
+## Immer
+
+```js
+```
+
+---
+
+- Create a "draft"
+- Mutate the draft
+- Return a new object
+- Original remains untouched
+
+---
+
+### Reducers
+
+```js
+import produce from "immer"
+
+let todos = [{ name: "Eat" }, { name: "Sleep" }]
+
+let reducer = produce((state, action) => {
+  switch (action.type) {
+    case "ADD":
+      state.push(action.payload)
+      break
+  }
+})
+
+let newTodos = reducer(todos, { type: "ADD", payload: { name: "Code" } })
+console.log(newTodos)
+```
+
+---
+
+### Composes
+
+```js
+import produce from "immer"
+import { compose } from "ramda"
+
+let person = {
+  first: "John"
+}
+
+let mindyify = produce(draft => {
+  draft.first = "Mindy"
+})
+
+let shout = produce(draft => {
+  draft.first += "!"
+})
+
+let mindyShout = compose(
+  shout,
+  mindyify
+)
+
+let loudMindy = mindyShout(person)
+
+console.log(loudMindy)
+```
+
+---
+
+## Vue 3
+
+```js
+```

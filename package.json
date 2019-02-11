@@ -1,0 +1,18 @@
+{
+  "name": "proxy-presentation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "theme.js",
+  "dependencies": {
+    "mdx-deck": "^1.8.2",
+    "react-syntax-highlighter": "^10.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "mdx-deck deck.mdx",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
