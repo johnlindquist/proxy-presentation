@@ -205,55 +205,76 @@ person = track(person)
 
 ---
 
+# Make Changes
+
 ```js
 person.first = "Mindy"
 person.last = "Smith"
 person.age = 36
+```
 
+## Review the entire history
+
+```js
 review(person) //[Object, Object, Object, Object]
+```
+
+## Or a previous version
+
+```js
 review(person, -1) //{first: "Mindy", last: "Smith", age: 37}
 review(person, -2) //{first: "Mindy", last: "Lindquist", age: 37}
 ```
 
 ---
 
-## Hi
+## Lock it in a box
 
 ```js
-const proxy = new Proxy({}, {})
-```
+import { box } from "@johnlindquist/has-bad-ideas"
 
----
-
----
-
-#Box
-
-```js
 let person = {
   first: "John",
   last: "Lindquist",
   age: 37
 }
-```
 
-```js
 person = box(person)
 ```
+
+---
+
+## Throw Error on "set"
+
+```js
+person.first = "Mindy" //throws "I'm in a box!"
+```
+
+---
+
+## All Properties are Getter/Setters
 
 ```js
 person.first() //"John"
 person.first("Mindy") //{...person, first: "Mindy"}
 ```
 
+---
+
+## Setters Accept Functions
+
 ```js
-let fn = str => string.toUpperCase()
-person.first(fn) //{...person, name:"JOHN"}
+let shout = str => string.toUpperCase()
+person.first(shout) //{...person, name:"JOHN"}
 ```
+
+---
+
+## Chain Together Prop Calls
 
 ```js
 person
-  .first(fn)
+  .first(shout)
   .last("Smith")
   .age(i => i + 1)
 //{first: "JOHN", last: "Smith", age: 38}
@@ -261,19 +282,27 @@ person
 
 ---
 
-# Chain
+# Speaking of "chain" 🤔
+
+---
+
+## Lodash All the Things 🤪
 
 ```js
+import { chain } from "@johnlindquist/has-bad-ideas"
+
 let person = {
   first: "John",
   last: "Lindquist",
   age: 37
 }
-```
 
-```js
 person = chain(person)
 ```
+
+---
+
+## Every Property Has All Lodash Methods
 
 ```js
 person.first
@@ -284,12 +313,22 @@ person.first
 //"JanJanJan"
 ```
 
+## Pointless? Probably!
+
 ---
 
-# Observe
+> We reactive-ed
+
+> We lodash-ed
+
+## What about the lodash of reactive programming...
+
+---
+
+## RxJS Time
 
 ```js
-import { observe } from "@johnlindquist/has-bad-ideas"
+import { rxify } from "@johnlindquist/has-bad-ideas"
 import { switchMap, mapTo } from "rxjs/operators"
 import { interval } from "rxjs"
 
@@ -297,10 +336,12 @@ let person = {
   name: "John"
 }
 
-person = observe(person)
+person = rxify(person)
 ```
 
 ---
+
+## Log the Name Every Second
 
 ```js
 person
@@ -310,9 +351,41 @@ person
     })
   )
   .subscribe(console.log)
+
+person.name = "Mindy"
 ```
 
 https://codesandbox.io/s/7z5j45mwv6
+
+---
+
+## Wat?
+
+```js
+let first$ = person.first()
+let last$ = person.last()
+
+combineLatest(first$, last$)
+  .pipe(map(([first, last]) => `${first} ${last}`))
+  .subscribe(console.log)
+
+// "John Lindquist"
+// "Mindy Lindquist"
+// "Mindy Smith"
+
+person.first = "Mindy"
+person.last = "Smith"
+```
+
+https://codesandbox.io/s/jvwp7lk5q3
+
+---
+
+## Async Properties? Easy!
+
+<br />
+
+## But how about _dynamic_ async properties!
 
 ---
 
@@ -330,7 +403,8 @@ Get `/people` from api:
 
 ```js
 async function main() {
-  let people = await api.people() //Response JSON'ed
+  //'get' request to https://swapi.co/api/people
+  let people = await api.people()
 }
 
 main()
@@ -341,28 +415,54 @@ main()
 Get `/people/1` from api:
 
 ```js
+//'get' request to https://swapi.co/api/people/1
 let person = await api.people(1)
-//
 ```
 
 https://codesandbox.io/s/73qv66745j
 
 ---
 
-# Good Ideas
+# 💡 Good Ideas 💡
 
 ---
 
-## Lenses
+## Traditional Lenses
+
+Strings 🤮
 
 ```js
+//ramda lens
+R.lensPath(["images", "avatar", "big"])
+```
+
+<br />
+
+## Lens Proxy
+
+Recursive Trapped Properties 🎉
+
+```js
+let _ = lensProxy()
+
+_.images.avatar.big
 ```
 
 ---
 
-## Immer
+## Immer - Simple Immutability
 
 ```js
+import produce from "immer"
+
+let nums = [1, 2]
+
+let push3 = produce(draft => {
+  draft.push(3)
+})
+
+let newNums = push3(nums)
+// [1, 2, 3]
 ```
 
 ---
@@ -374,11 +474,31 @@ https://codesandbox.io/s/73qv66745j
 
 ---
 
-### Reducers
+## Elimantes Cloning/Merging
 
 ```js
-import produce from "immer"
+let person = {
+  name: "John",
+  contact: {
+    email: {
+      provider: "gmail"
+    }
+  }
+}
 
+let changeProvider = produce(draft => {
+  //It doesn't get simpler
+  draft.contact.email.provider = "AOL"
+})
+
+let personAOL = changeProvider(person)
+```
+
+---
+
+## Can Replace Reducers
+
+```js
 let todos = [{ name: "Eat" }, { name: "Sleep" }]
 
 let reducer = produce((state, action) => {
@@ -389,8 +509,8 @@ let reducer = produce((state, action) => {
   }
 })
 
-let newTodos = reducer(todos, { type: "ADD", payload: { name: "Code" } })
-console.log(newTodos)
+let action = { type: "ADD", payload: { name: "Code" } }
+let newTodos = reducer(todos, action)
 ```
 
 ---
