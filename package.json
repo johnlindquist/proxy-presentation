@@ -4,11 +4,13 @@
   "description": "",
   "main": "theme.js",
   "dependencies": {
-    "mdx-deck": "^1.8.2",
-    "react-syntax-highlighter": "^10.1.2"
+    "mdx-deck": "^1.8.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mdx-deck-code-surfer": "^0.5.5"
+  },
   "scripts": {
+    "build": "mdx-deck build --no-html deck.mdx",
     "start": "mdx-deck deck.mdx",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
