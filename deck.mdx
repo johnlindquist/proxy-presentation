@@ -203,13 +203,9 @@ export const observable = (obj, callback) => {
 
 ---
 
-```bash
-npm i @johnlindquist/has-bad-ideas
+### Install my bad ideas
 
-----
-* > Install my bad ideas
-
-```
+## npm i @johnlindquist/has-bad-ideas
 
 ---
 
@@ -624,30 +620,31 @@ get(target, key) {
 
 ---
 
-## Traditional Lenses
-
-Strings 🤮
-
 ```js
 //ramda lens
 R.lensPath(["images", "avatar", "big"])
+----
+* > Traditional Lenses use Strings 🤮
+2[6] > Ew
+2[9] > Yuck
+2[12] > Gross
 ```
 
-<br />
-
-## Lens Proxy
-
-Recursive Trapped Properties 🎉
+---
 
 ```js
 let _ = lensProxy()
 
 _.images.avatar.big
+----
+* > How About a Lens Proxy!
+3[2] > No
+3[4] > Strings
+3[6] > Here
+3 > Recursive Trapped Properties 🎉
 ```
 
 ---
-
-## Basic Idea
 
 ```js
 import { lens as _ } from "@johnlindquist/has-bad-ideas"
@@ -658,12 +655,14 @@ let person = { contact: { email: { provider: "gmail" } } }
 let value = provider(person)
 
 console.log(value)
-// John
+// gmail
+----
+* > The basic idea
+3 > Chained properties create a function
+4,6 > The function "focuses" on object
 ```
 
 ---
-
-## Gather Keys, Return Proxies
 
 ```js
 let handler = {
@@ -678,39 +677,33 @@ let handler = {
     }, handler)
   }
 }
+
+----
+* > "lens" implementation
+6 > Return a Proxy
+2,4 > Gather keys
+7,9[3] > Reduce keys onto the object
+8 > Return the value
+
 ```
 
 ---
 
-## "Maybe" Properties Start
+# npm i focused
 
-```js
-//Attempting to get/set "company", but fail silently
-_.$company.avatar.big
-```
+https://github.com/yelouafi/focused/
 
-### Parse Key
-
-```js
-get(target, key){
-  if(key.startsWith(""){
-    if(Reflect.has(target, key){
-      //apply function and return
-    })
-    //do nothing
-  })
-}
-```
+### (a much better proxy lens implementation)
 
 ---
 
-# Immer
+# npm i immer
 
-## Blending Mutatable and Immutable
+https://github.com/mweststrate/immer
+
+### A Return to the JavaScript Basics
 
 ---
-
-## Blending Mutatable and Immutable
 
 ```js
 import produce from "immer"
@@ -723,18 +716,16 @@ let push3 = produce(draft => {
 
 let newNums = push3(nums)
 // [1, 2, 3]
+----
+* > Blend Mutable and Immutable
+3,9,10 > Our function creates a new object
+5[2,5] > "produce" creates the function
+5[7] > "draft" is a proxy
+6 > which you mutate
+* > 🤯
 ```
 
 ---
-
-- Create a "draft"
-- Mutate the draft
-- Return a new object
-- Original remains untouched
-
----
-
-## Elimantes Cloning/Merging
 
 ```js
 let person = {
@@ -752,30 +743,49 @@ let changeProvider = produce(draft => {
 })
 
 let personAOL = changeProvider(person)
+
+----
+* > No more deep cloning/merging
+5 > "provider" is pretty deep
+11,12 > But so easy to update!
+
 ```
 
 ---
 
-## Can Replace Reducers
-
 ```js
-let todos = [{ name: "Eat" }, { name: "Sleep" }]
-
 let reducer = produce((state, action) => {
+  let todo = action.payload
+
   switch (action.type) {
+
     case "ADD":
-      state.push(action.payload)
+      state.push(todo)
+      break
+
+    case "UPDATE":
+      let index = state.findIndex(t => todo.id === t.id)
+      state[index].done = true
+      break
+
+    case "DELETE":
+      let index = state.findIndex(t => todo.id === t.id)
+      state.splice(index, 1)
       break
   }
 })
 
-let action = { type: "ADD", payload: { name: "Code" } }
-let newTodos = reducer(todos, action)
+----
+* > Complex Reducers Begone!
+1[7] > "state" is a draft
+6,7 > Add? Easy
+10:12 > Update? No problem
+15:17 > Delete? Piece of 🍰
+
+
 ```
 
 ---
-
-### Composes
 
 ```js
 import { compose } from "ramda"
@@ -798,25 +808,27 @@ let mindyShout = compose(
 )
 
 let loudMindy = mindyShout(person)
+
+----
+* > Immer functions even compose!
+7,11 > They're just functions
+15:20 > So build them together
 ```
 
 ---
 
-## Vue 3
-
 ```js
 // Whatever Evan said before me
 // I hope... :)
+
+----
+* > Vue 3 Reactivity
 ```
 
 ---
 
 # Summary
 
----
+## Do whatever you want 🤷‍♂️
 
-- Gather Keys
-- Dynamic Keys
-- Prevent Set
-- Get Functions
--
+---
