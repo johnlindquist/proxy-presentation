@@ -242,18 +242,68 @@ person.age = 36
 ---
 
 ```js
-review(person) //[Object, Object, Object, Object]
-review(person, -1) //{first: "Mindy", last: "Smith", age: 37}
-review(person, -2) //{first: "Mindy", last: "Lindquist", age: 37}
+review(person)
+//[Object, Object, Object, Object]
+review(person, -1)
+//{first: "Mindy", last: "Smith", age: 37}
+review(person, -2)
+//{first: "Mindy", last: "Lindquist", age: 37}
 ----
 * > Use "review" to view history
-1 > The entire history
-2:3 > Or previous snapshots
+1:2 > The entire history
+3:6 > Or previous snapshots
 ```
 
 ---
 
-## Lock it in a box
+```js
+const map = new WeakMap()
+
+export const track = obj => {
+  map.set(proxy, [{ ...obj }])
+
+  const proxy = new Proxy(obj, {
+    set(target, key, value) {
+      const success = Reflect.set(target, key, value)
+
+      if (success) {
+        map.set(proxy, [...map.get(proxy), {...target}])
+      }
+
+      return success
+    }
+  })
+
+  return proxy
+}
+----
+* > "track" Implementation
+1 > Create a Map to map Proxies to Histories
+4 > Store a clone of the intial target
+10:12 > Store clones of future targets
+```
+
+---
+
+```js
+export const review = (proxy, index) => {
+  const history = map.get(proxy)
+  if (index === undefined) {
+    return history
+  }
+  if (index < 0) {
+    return history[history.length + index - 1]
+  }
+  return history[index]
+}
+
+----
+* > "review" implementation
+2 > get the history from the proxy
+4,7,9 > return full history or snapshot
+```
+
+---
 
 ```js
 import { box } from "@johnlindquist/has-bad-ideas"
@@ -265,37 +315,91 @@ let person = {
 }
 
 person = box(person)
+
+----
+* > Lock it in a box
+9 > Create a Proxy with "box"
 ```
 
 ---
-
-## Throw Error on "set"
 
 ```js
-person.first = "Mindy" //throws "I'm in a box!"
+person.first = "Mindy"
+//throws "I'm in a box!"
+----
+* > Throw an error when attempting "set"
 ```
 
 ---
-
-## All Properties are Getter/Setters
 
 ```js
-person.first() //"John"
-person.first("Mindy") //{...person, first: "Mindy"}
+person.first()
+//"John"
+person.first("Mindy")
+//{...person, first: "Mindy"}
+----
+* > Instead, all properties are getters/setters
+1:2 > Getter
+3:4 > Setter
+
 ```
 
 ---
-
-## Setters Accept Functions
 
 ```js
 let shout = str => string.toUpperCase()
-person.first(shout) //{...person, name:"JOHN"}
+person.first(shout)
+//{...person, name:"JOHN"}
+----
+* > Setters also accept functions
+1 > A function that uppercases a string
+2:3 > Pass the function to the "setter"
 ```
 
 ---
 
-## Chain Together Prop Calls
+```js
+ let handler = {
+    set() {
+      throw "I'm in a box!"
+    },
+    [...]
+ }
+
+----
+
+ * > The "set" implementation
+ 2:4 > Don't even try it!
+```
+
+---
+
+```js
+get(target, key) {
+  return value => {
+    if (typeof value === "function")
+      return new Proxy(
+        { ...target, [key]: value(Reflect.get(target, key)) },
+        handler
+      )
+    if (value) {
+      return new Proxy({ ...target, [key]: value }, handler)
+    }
+    return Reflect.get(target, key)
+  }
+}
+
+
+----
+* > The "get" implementation
+2 > Return a function
+3,8 > Check the function argument
+4:7 > If function, apply to value, return Proxy
+9 > If value, set and return Proxy
+11 > Or get the value
+```
+
+---
 
 ```js
 person
@@ -303,6 +407,13 @@ person
   .last("Smith")
   .age(i => i + 1)
 //{first: "JOHN", last: "Smith", age: 38}
+----
+* > Since "setters" return the Proxy
+1 > Let's
+2 > chain
+3 > together
+4 > properties!
+5 > 😂
 ```
 
 ---
@@ -310,8 +421,6 @@ person
 # Speaking of "chain" 🤔
 
 ---
-
-## Lodash All the Things 🤪
 
 ```js
 import { chain } from "@johnlindquist/has-bad-ideas"
@@ -323,11 +432,13 @@ let person = {
 }
 
 person = chain(person)
+
+----
+* > Lodash All the Things 🤪
+9 > "chain" creates a Proxy
 ```
 
 ---
-
-## Every Property Has All Lodash Methods
 
 ```js
 person.first
@@ -336,9 +447,34 @@ person.first
   .value()
 
 //"JanJanJan"
+----
+* > Now every property has all lodash methods!
 ```
 
-## Pointless? Probably!
+---
+
+```js
+import  _ from "lodash"
+export const chain = obj => {
+  const handler = {
+    set() {
+      throw "I'm in a box!"
+    },
+    get(target, key) {
+      return _.chain(Reflect.get(target, key))
+    }
+  }
+
+  return new Proxy(obj, handler)
+}
+----
+* > Full "chain" implementation
+8 > Return the wrapped value
+```
+
+---
+
+# Pointless? Probably!
 
 ---
 
