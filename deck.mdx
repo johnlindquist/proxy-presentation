@@ -486,8 +486,6 @@ export const chain = obj => {
 
 ---
 
-## RxJS Time
-
 ```js
 import { rxify } from "@johnlindquist/has-bad-ideas"
 import { switchMap, mapTo } from "rxjs/operators"
@@ -498,11 +496,12 @@ let person = {
 }
 
 person = rxify(person)
+----
+* > How about some RxJS 😎
+9 > Create the Proxy
 ```
 
 ---
-
-## Log the Name Every Second
 
 ```js
 person
@@ -514,13 +513,18 @@ person
   .subscribe(console.log)
 
 person.name = "Mindy"
+
+----
+* > Log the name out every second
+2,6 > Properties accept operators and return Observables
+3:5 > So pass in whatever you want
+7 > Then subscribe to changes
+
 ```
 
 https://codesandbox.io/s/7z5j45mwv6
 
 ---
-
-## Wat?
 
 ```js
 let first$ = person.first()
@@ -536,6 +540,15 @@ combineLatest(first$, last$)
 
 person.first = "Mindy"
 person.last = "Smith"
+
+----
+* > Welcome to crazy town
+1:2 > Grab two property streams
+4:6 > Combine them for a good time 🎉
+12:13 > Setting values
+8:10 > Pushes them through the stream
+
+
 ```
 
 https://codesandbox.io/s/jvwp7lk5q3
@@ -550,37 +563,60 @@ https://codesandbox.io/s/jvwp7lk5q3
 
 ---
 
-## Create API
-
 ```js
 import { createApi } from "@johnlindquist/has-bad-ideas"
 
 let api = createApi("https://swapi.co/api")
+
+----
+* > Create an api
+3 > "api" is now a Proxy
+
 ```
 
 ---
-
-Get `/people` from api:
 
 ```js
 async function main() {
   //'get' request to https://swapi.co/api/people
   let people = await api.people()
+
+  //'get' request to https://swapi.co/api/people/1
+  let person = await api.people(1)
 }
 
 main()
-```
 
----
-
-Get `/people/1` from api:
-
-```js
-//'get' request to https://swapi.co/api/people/1
-let person = await api.people(1)
+----
+* > Get `/people` from api:
+2:3 > "people()" requests "/people"
+5:6 > "people(1)" requests "/people/1"
 ```
 
 https://codesandbox.io/s/73qv66745j
+
+---
+
+```js
+get(target, key) {
+  return async function(id = "") {
+    const url = `${url}/${key}/${id}`
+    const response = await fetch(url)
+    if (response.ok) {
+      return response.json()
+    }
+
+    return Promise.resolve({ error: "Malformed Request" })
+  }
+}
+
+----
+* > "createApi" implementation
+2 > "get" returns an async function
+3 > by parsing the "key" and "id"
+4 > and await'ing a fetch
+6:9 > then returning json or an error
+```
 
 ---
 
