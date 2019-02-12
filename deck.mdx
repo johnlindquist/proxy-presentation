@@ -189,7 +189,7 @@ npm i @johnlindquist/has-bad-ideas
 
 ---
 
-# Track
+# Track and Review
 
 ```js
 import { track, review } from "@johnlindquist/has-bad-ideas"
@@ -450,7 +450,70 @@ _.images.avatar.big
 
 ---
 
-## Immer - Simple Immutability
+## Basic Idea
+
+```js
+import { lens as _ } from "@johnlindquist/has-bad-ideas"
+
+let provider = _.contact.email.provider
+let person = { contact: { email: { provider: "gmail" } } }
+
+let value = provider(person)
+
+console.log(value)
+// John
+```
+
+---
+
+## Gather Keys, Return Proxies
+
+```js
+let handler = {
+  keys: [],
+  get(target, key) {
+    this.keys.push(key)
+
+    return new Proxy(obj => {
+      return this.keys.reduce((acc, key) => {
+        return Reflect.get(acc, key)
+      }, obj)
+    }, handler)
+  }
+}
+```
+
+---
+
+## "Maybe" Properties Start with ﹩
+
+```js
+//Attempting to get/set "company", but fail silently
+_.$company.avatar.big
+```
+
+### Check if Key Starts with ﹩
+
+```js
+get(target, key){
+  if(key.startsWith("$"){
+    if(Reflect.has(target, key){
+      //apply function and return
+    })
+    //do nothing
+  })
+}
+```
+
+---
+
+# Immer
+
+## Blending Mutatable and Immutable
+
+---
+
+## Blending Mutatable and Immutable
 
 ```js
 import produce from "immer"
@@ -518,7 +581,6 @@ let newTodos = reducer(todos, action)
 ### Composes
 
 ```js
-import produce from "immer"
 import { compose } from "ramda"
 
 let person = {
@@ -539,8 +601,6 @@ let mindyShout = compose(
 )
 
 let loudMindy = mindyShout(person)
-
-console.log(loudMindy)
 ```
 
 ---
@@ -548,4 +608,6 @@ console.log(loudMindy)
 ## Vue 3
 
 ```js
+// Whatever Evan said before me
+// I hope... :)
 ```
