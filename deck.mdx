@@ -1,6 +1,12 @@
 export { components } from "mdx-deck-code-surfer"
 export theme from "./theme"
 
+# Follow Along
+
+## proxy.johnlindquist.com
+
+---
+
 # Relax
 
 ---
@@ -44,7 +50,11 @@ Object.keys(person).forEach(key => {
 
 # This Presentation is About Proxies
 
-> My name is John Lindquist
+-
+
+## My name is John Lindquist
+
+## @johnlindquist
 
 ---
 
@@ -56,7 +66,9 @@ Object.keys(person).forEach(key => {
 
 # Why Should You Care?
 
-Because it opens a whole new world of possibilities
+-
+
+## Because proxies open a whole new world of possibilities
 
 ---
 
@@ -203,7 +215,9 @@ export const observable = (obj, callback) => {
 
 ---
 
-### Install my bad ideas
+# Install my bad ideas
+
+-
 
 ## npm i @johnlindquist/has-bad-ideas
 
@@ -444,8 +458,15 @@ person.first
 
 //"JanJanJan"
 ----
-* > Now every property has all lodash methods!
+* > Every property has lodash methods!
+2 > "replace"
+3 > "repeat"
+4 > "value"
 ```
+
+---
+
+# Pointless? Probably!
 
 ---
 
@@ -467,10 +488,6 @@ export const chain = obj => {
 * > Full "chain" implementation
 8 > Return the wrapped value
 ```
-
----
-
-# Pointless? Probably!
 
 ---
 
@@ -518,8 +535,6 @@ person.name = "Mindy"
 
 ```
 
-https://codesandbox.io/s/7z5j45mwv6
-
 ---
 
 ```js
@@ -546,8 +561,6 @@ person.last = "Smith"
 
 
 ```
-
-https://codesandbox.io/s/jvwp7lk5q3
 
 ---
 
@@ -588,8 +601,6 @@ main()
 2:3 > "people()" requests "/people"
 5:6 > "people(1)" requests "/people/1"
 ```
-
-https://codesandbox.io/s/73qv66745j
 
 ---
 
@@ -832,3 +843,43 @@ let loudMindy = mindyShout(person)
 ## Do whatever you want 🤷‍♂️
 
 ---
+
+# Demos
+
+Logger
+https://codesandbox.io/s/xo8jy0zzqq
+
+Observable
+https://codesandbox.io/s/882wzz4q08
+
+box
+https://codesandbox.io/s/8lv0k5qpr8
+
+chain
+https://codesandbox.io/s/6qro6oj7k
+
+RxJS
+https://codesandbox.io/s/7z5j45mwv6
+
+CombineLatest
+https://codesandbox.io/s/jvwp7lk5q3
+
+createAPI
+https://codesandbox.io/s/73qv66745j
+
+lens
+https://codesandbox.io/s/kyx77k21v
+
+immer basic
+https://codesandbox.io/s/lx5w2035kl
+
+immer todos
+https://codesandbox.io/s/3xo5yr5jkp
+
+---
+
+# Thanks
+
+## @johnlindquist
+
+### (subscribe to egghead.io)
