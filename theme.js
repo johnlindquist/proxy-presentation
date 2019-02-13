@@ -8,16 +8,16 @@ export default {
     ...nightOwl,
     plain: {
       ...nightOwl.plain,
-      fontFamily: "Dank Mono"
+      fontFamily: "Dank Mono, monospace"
     }
   },
 
   // add a custom font
-  font: "Dank Mono",
+  font: "Source Sans Pro, sans-serif",
 
   blockquote: {
-    border: "2rem solid gray",
+    border: ".25rem solid lightgray",
     padding: "2rem"
-  }
-  // custom colors
+  },
+  fontSizes: ["0.75em", "1em", "1.5em", "1.75em", "2em"]
 }
